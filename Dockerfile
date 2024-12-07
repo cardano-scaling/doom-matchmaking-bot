@@ -1,0 +1,13 @@
+FROM gradle:8.8-jdk21-alpine AS builder
+
+COPY . /temp
+WORKDIR /temp
+
+RUN gradle build -x test
+
+FROM alpine/java:21-jdk AS runner
+
+COPY --from=builder /temp/app/build/libs/bot.jar /bot.jar
+COPY --from=builder /temp/.env /.env
+
+CMD java -XX:MaxRAMFraction=2 -jar bot.jar
