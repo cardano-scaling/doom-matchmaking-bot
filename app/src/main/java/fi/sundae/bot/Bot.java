@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public class Bot {
 
@@ -20,7 +21,9 @@ public class Bot {
 
   public Bot(String token, String ownerId, String channelId, String adminRoleId) {
     this.MATCHMAKER = new Matchmaker(channelId);
-    JDABuilder jdaBuilder = JDABuilder.createDefault(token);
+    JDABuilder jdaBuilder = JDABuilder.createDefault(token).enableIntents(GatewayIntent.GUILD_MEMBERS,
+                                                                          GatewayIntent.MESSAGE_CONTENT);
+
     CommandClientBuilder commandBuilder =
         new CommandClientBuilder()
             .setActivity(Activity.competing("Hydra DOOM"))
