@@ -9,7 +9,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -36,21 +35,29 @@ public class MatchmakeCommand extends SlashCommand {
       return;
     }
 
-    Optional<Region> maybeRegion = event.getOption("region") == null ? Optional.empty() :
-                                   Optional.ofNullable(Region.fromRegionName(
-                                           Objects.requireNonNull(event.getOption("region")).getAsString()));
+    Optional<Region> maybeRegion =
+        event.getOption("region") == null
+            ? Optional.empty()
+            : Optional.ofNullable(
+                Region.fromRegionName(
+                    Objects.requireNonNull(event.getOption("region")).getAsString()));
 
-
-    maybeRegion.ifPresentOrElse(region -> {
-      Optional<Match> maybeMatch = MATCHMAKER.buildMatch(region);
-      maybeMatch.ifPresent(match -> MATCHMAKER.announceMatches(List.of(match), event.getJDA()));
-      event.getHook().editOriginal(String.format("Created a match if applicable for region %s",
-                                                 region.getPrettyName())).queue();
-    }, () -> {
-      List<Match> matches = MATCHMAKER.buildAllMatches();
-      MATCHMAKER.announceMatches(matches, event.getJDA());
-      event.getHook().editOriginal("Created a match if applicable in every region").queue();
-    });
+    maybeRegion.ifPresentOrElse(
+        region -> {
+          Optional<Match> maybeMatch = MATCHMAKER.buildMatch(region);
+          maybeMatch.ifPresent(match -> MATCHMAKER.announceMatches(List.of(match), event.getJDA()));
+          event
+              .getHook()
+              .editOriginal(
+                  String.format(
+                      "Created a match if applicable for region %s", region.getPrettyName()))
+              .queue();
+        },
+        () -> {
+          List<Match> matches = MATCHMAKER.buildAllMatches();
+          MATCHMAKER.announceMatches(matches, event.getJDA());
+          event.getHook().editOriginal("Created a match if applicable in every region").queue();
+        });
   }
 
   private MessageEmbed getNotAllowedEmbed() {
