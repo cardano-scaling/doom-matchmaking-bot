@@ -18,7 +18,7 @@ public class Bot {
 
   private final Matchmaker MATCHMAKER;
 
-  public Bot(String token, String ownerId, String channelId) {
+  public Bot(String token, String ownerId, String channelId, String adminRoleId) {
     this.MATCHMAKER = new Matchmaker(channelId);
     JDABuilder jdaBuilder = JDABuilder.createDefault(token);
     CommandClientBuilder commandBuilder =
@@ -27,7 +27,7 @@ public class Bot {
             .setOwnerId(ownerId)
             .setStatus(OnlineStatus.ONLINE)
             .addSlashCommands(
-                    new ReadyCommand(MATCHMAKER), new MatchmakeCommand(ownerId, MATCHMAKER));
+                new ReadyCommand(MATCHMAKER), new MatchmakeCommand(adminRoleId, MATCHMAKER));
     jdaBuilder.addEventListeners(commandBuilder.build());
 
     JDA jda = jdaBuilder.build();
@@ -35,15 +35,15 @@ public class Bot {
   }
 
   private void scheduleMatchmaking(JDA jda) {
-    try(ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
+    try (ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
       executor.scheduleAtFixedRate(
-              () -> {
-                List<Match> matches = MATCHMAKER.buildAllMatches();
-                MATCHMAKER.announceMatches(matches, jda);
-              },
-              0,
-              10,
-              TimeUnit.MINUTES);
+          () -> {
+            List<Match> matches = MATCHMAKER.buildAllMatches();
+            MATCHMAKER.announceMatches(matches, jda);
+          },
+          0,
+          10,
+          TimeUnit.MINUTES);
     }
   }
 }

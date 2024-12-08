@@ -15,12 +15,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class MatchmakeCommand extends SlashCommand {
-
-  private final String ADMIN;
+  private final String ADMIN_ROLE_ID;
   private final Matchmaker MATCHMAKER;
 
-  public MatchmakeCommand(String admin, Matchmaker matchmaker) {
-    this.ADMIN = admin;
+  public MatchmakeCommand(String adminRoleId, Matchmaker matchmaker) {
+    this.ADMIN_ROLE_ID = adminRoleId;
     this.MATCHMAKER = matchmaker;
     this.name = "matchmake";
     this.help = "Force matchmaking for a region or for all regions";
@@ -30,7 +29,8 @@ public class MatchmakeCommand extends SlashCommand {
   @Override
   protected void execute(SlashCommandEvent event) {
     event.deferReply(true).queue();
-    if (!Objects.requireNonNull(event.getMember()).getId().equals(ADMIN)) {
+    if (Objects.requireNonNull(event.getMember()).getRoles().stream()
+        .noneMatch(role -> role.getId().equals(ADMIN_ROLE_ID))) {
       event.getHook().editOriginalEmbeds(getNotAllowedEmbed()).queue();
       return;
     }
