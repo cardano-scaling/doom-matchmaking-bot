@@ -18,11 +18,12 @@ public class Listener extends ListenerAdapter {
 
   @Override
   public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+    LOGGER.info("guild member joined!");
     List<String> qualifiedUsers;
     try {
       qualifiedUsers = QUALIFIER_REPOSITORY.getQualifiedDiscordAccounts();
     } catch (IOException e) {
-      LOGGER.info("Failed to validate user {}, failing open", event.getMember().getId());
+      LOGGER.warn("Failed to validate user {}, failing open", event.getMember().getId());
       return;
     }
 
@@ -34,9 +35,13 @@ public class Listener extends ListenerAdapter {
                     ? QUALIFIED_ROLE_ID
                     : FAN_ROLE_ID);
     if (role == null) {
+      LOGGER.warn("role is null {} | QUALIFIED: {} | FAN: {}", qualifiedUsers.contains(event.getMember().getId()),
+                  QUALIFIED_ROLE_ID, FAN_ROLE_ID);
       return;
     }
 
     event.getGuild().addRoleToMember(event.getMember().getUser(), role).queue();
+
+    LOGGER.info("Gave role {} to {}", role.getId(), event.getMember().getId());
   }
 }
