@@ -35,7 +35,7 @@ public class QualifierRepository {
       for (JsonElement elem : json) {
         try {
           JsonObject user = elem.getAsJsonObject();
-          if(user.get("linked_discord_account").isJsonNull()) {
+          if (user.get("linked_discord_account").isJsonNull()) {
             continue;
           }
           JsonObject discordObject = user.get("linked_discord_account").getAsJsonObject();
