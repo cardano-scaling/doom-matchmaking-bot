@@ -3,8 +3,10 @@ package fi.sundae.bot.commands;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import fi.sundae.bot.tournament.Matchmaker;
+import fi.sundae.bot.tournament.QualifierRepository;
 import fi.sundae.bot.tournament.Region;
 import java.awt.*;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 public class RegisterCommand extends SlashCommand {
 
   private final Matchmaker MATCHMAKER;
+  private final QualifierRepository QUALIFIER_REPOSITORY = new QualifierRepository();
 
   public RegisterCommand(Matchmaker matchmaker) {
     this.MATCHMAKER = matchmaker;
@@ -30,8 +33,15 @@ public class RegisterCommand extends SlashCommand {
     event.deferReply(true).queue();
 
     Member member = Objects.requireNonNull(event.getMember());
+    List<String> qualifiedUsers;
+    try {
+      qualifiedUsers = QUALIFIER_REPOSITORY.getQualifiedDiscordAccounts();
+    } catch (IOException e) {
+      event.getHook().editOriginalEmbeds(getErrorEmbed()).queue();
+      return;
+    }
 
-    if (!getQualifiedUsers().contains(member.getId())) {
+    if (qualifiedUsers.contains(member.getId())) {
       event.getHook().editOriginalEmbeds(getPermissionDeniedEmbed()).queue();
       return;
     }
@@ -87,9 +97,14 @@ public class RegisterCommand extends SlashCommand {
         .build();
   }
 
-  private List<String> getQualifiedUsers() {
-    // TODO: fetch from DDz
-    return List.of("128987369285222400");
+  private MessageEmbed getErrorEmbed() {
+    return new EmbedBuilder()
+        .setTitle("Oops... Something went wrong!")
+        .setColor(Color.RED)
+        .setDescription(
+            "There was an error processing your request. Please try again shortly or contact tournament staff"
+                + " for help.")
+        .build();
   }
 
   private List<OptionData> getCommandOptions() {

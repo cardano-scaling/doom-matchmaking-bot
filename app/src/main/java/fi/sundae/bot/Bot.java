@@ -35,14 +35,15 @@ public class Bot {
   }
 
   private void scheduleMatchmaking(JDA jda) {
-    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    executor.scheduleAtFixedRate(
-        () -> {
-          List<Match> matches = MATCHMAKER.buildAllMatches();
-          MATCHMAKER.announceMatches(matches, jda);
-        },
-        0,
-        1,
-        TimeUnit.MINUTES);
+    try(ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
+      executor.scheduleAtFixedRate(
+              () -> {
+                List<Match> matches = MATCHMAKER.buildAllMatches();
+                MATCHMAKER.announceMatches(matches, jda);
+              },
+              0,
+              10,
+              TimeUnit.MINUTES);
+    }
   }
 }

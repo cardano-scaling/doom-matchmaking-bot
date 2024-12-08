@@ -22,6 +22,8 @@ dependencies {
     implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
 
     implementation group: 'io.github.cdimascio', name: 'java-dotenv', version: '5.1.1'
+    implementation 'com.google.code.gson:gson:2.11.0'
+
 
     testImplementation libs.junit.jupiter
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
