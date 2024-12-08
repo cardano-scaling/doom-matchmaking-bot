@@ -2,7 +2,7 @@ package fi.sundae.bot;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import fi.sundae.bot.commands.MatchmakeCommand;
-import fi.sundae.bot.commands.RegisterCommand;
+import fi.sundae.bot.commands.ReadyCommand;
 import fi.sundae.bot.tournament.Match;
 import fi.sundae.bot.tournament.Matchmaker;
 import java.util.List;
@@ -27,7 +27,7 @@ public class Bot {
             .setOwnerId(ownerId)
             .setStatus(OnlineStatus.ONLINE)
             .addSlashCommands(
-                new RegisterCommand(MATCHMAKER), new MatchmakeCommand(ownerId, MATCHMAKER));
+                    new ReadyCommand(MATCHMAKER), new MatchmakeCommand(ownerId, MATCHMAKER));
     jdaBuilder.addEventListeners(commandBuilder.build());
 
     JDA jda = jdaBuilder.build();

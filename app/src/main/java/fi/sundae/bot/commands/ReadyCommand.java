@@ -16,15 +16,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class RegisterCommand extends SlashCommand {
+public class ReadyCommand extends SlashCommand {
 
   private final Matchmaker MATCHMAKER;
   private final QualifierRepository QUALIFIER_REPOSITORY = new QualifierRepository();
 
-  public RegisterCommand(Matchmaker matchmaker) {
+  public ReadyCommand(Matchmaker matchmaker) {
     this.MATCHMAKER = matchmaker;
-    this.name = "register";
-    this.help = "Toggle your availability to play a match in a specified region";
+    this.name = "ready";
+    this.help = "Toggle your readiness to play a match in a specified region";
     this.options = getCommandOptions();
   }
 
@@ -65,10 +65,10 @@ public class RegisterCommand extends SlashCommand {
   private MessageEmbed getRegisteredEmbed(String region) {
     return new EmbedBuilder()
         .setColor(Color.GREEN)
-        .setTitle("Successfully Registered")
+        .setTitle("Ready!")
         .setDescription(
             """
-                You have successfully registered for an elimination match!
+                You have successfully been marked as **READY** for an elimination match!
 
                 You will be pinged if you are selected for a match. Please be ready and available""")
         .addField("Region", region, true)
@@ -78,9 +78,9 @@ public class RegisterCommand extends SlashCommand {
   private MessageEmbed getDeregisteredEmbed(String region) {
     return new EmbedBuilder()
         .setColor(Color.GREEN)
-        .setTitle("Successfully Deregistered")
+        .setTitle("Unready!")
         .setDescription(
-            "You have successfully deregistered for an elimination match. Thank you for playing!")
+            "You have successfully been marked as **UNREADY** for an elimination match. Thank you for playing!")
         .addField("Region", region, true)
         .build();
   }
@@ -91,7 +91,7 @@ public class RegisterCommand extends SlashCommand {
         .setColor(Color.RED)
         .setDescription(
             """
-            You must have a connected qualified account in order to register for a match. You do not have a connected qualified account.
+            You must have a connected qualified account in order to be marked as ready for a match. You do not have a connected qualified account.
 
             If you believe this is an error, please contact tournament staff.""")
         .build();
@@ -112,7 +112,7 @@ public class RegisterCommand extends SlashCommand {
         new OptionData(
                 OptionType.STRING,
                 "region",
-                "Specify the region in which you'd like to " + "play a match")
+                "Specify the region in which you'd like to play a match")
             .setRequired(true);
 
     for (Region r : Region.values()) {
