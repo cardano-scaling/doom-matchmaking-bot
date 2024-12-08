@@ -35,5 +35,5 @@ jobs:
           network: host
           push: true
           tags:
-            ghcr.io/cardano-scaling/doom-matchmaking-bot,ghcr.io/doom-matchmaking-bot:${{
+            ghcr.io/cardano-scaling/doom-matchmaking-bot,ghcr.io/cardano-scaling/doom-matchmaking-bot:${{
             github.sha }}
