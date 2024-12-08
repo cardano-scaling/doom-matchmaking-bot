@@ -35,6 +35,9 @@ public class QualifierRepository {
       for (JsonElement elem : json) {
         try {
           JsonObject user = elem.getAsJsonObject();
+          if(user.get("linked_discord_account").isJsonNull()) {
+            continue;
+          }
           JsonObject discordObject = user.get("linked_discord_account").getAsJsonObject();
           String discordId = discordObject.get("id").getAsString();
           discordIds.add(discordId);
@@ -55,9 +58,7 @@ public class QualifierRepository {
           HttpRequest.newBuilder()
               .uri(
                   new URI(
-                      "https://rewardengine.dripdropz"
-                          + ".io/api/v1/stats/leaderboard/d93212b3-dbdc-40d0"
-                          + "-befd-f90508c6232d/qualifiers"))
+                      "https://rewardengine.dripdropz.io/api/v1/stats/leaderboard/d93212b3-dbdc-40d0-befd-f90508c6232d/qualifiers"))
               .GET()
               .build();
 
