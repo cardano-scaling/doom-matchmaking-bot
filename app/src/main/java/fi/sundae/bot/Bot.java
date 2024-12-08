@@ -26,7 +26,8 @@ public class Bot {
             .setActivity(Activity.competing("Hydra DOOM"))
             .setOwnerId(ownerId)
             .setStatus(OnlineStatus.ONLINE)
-            .addSlashCommands(new RegisterCommand(MATCHMAKER), new MatchmakeCommand(ownerId, MATCHMAKER));
+            .addSlashCommands(
+                new RegisterCommand(MATCHMAKER), new MatchmakeCommand(ownerId, MATCHMAKER));
     jdaBuilder.addEventListeners(commandBuilder.build());
 
     JDA jda = jdaBuilder.build();
