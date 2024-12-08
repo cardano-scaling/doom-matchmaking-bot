@@ -28,7 +28,7 @@ public class Bot {
             .setStatus(OnlineStatus.ONLINE)
             .addSlashCommands(
                 new ReadyCommand(MATCHMAKER), new MatchmakeCommand(adminRoleId, MATCHMAKER));
-    jdaBuilder.addEventListeners(commandBuilder.build());
+    jdaBuilder.addEventListeners(commandBuilder.build(), new Listener());
 
     JDA jda = jdaBuilder.build();
     scheduleMatchmaking(jda);
