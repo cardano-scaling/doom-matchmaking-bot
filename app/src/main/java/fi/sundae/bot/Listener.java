@@ -35,8 +35,11 @@ public class Listener extends ListenerAdapter {
                     ? QUALIFIED_ROLE_ID
                     : FAN_ROLE_ID);
     if (role == null) {
-      LOGGER.warn("role is null {} | QUALIFIED: {} | FAN: {}", qualifiedUsers.contains(event.getMember().getId()),
-                  QUALIFIED_ROLE_ID, FAN_ROLE_ID);
+      LOGGER.warn(
+          "role is null {} | QUALIFIED: {} | FAN: {}",
+          qualifiedUsers.contains(event.getMember().getId()),
+          QUALIFIED_ROLE_ID,
+          FAN_ROLE_ID);
       return;
     }
 
