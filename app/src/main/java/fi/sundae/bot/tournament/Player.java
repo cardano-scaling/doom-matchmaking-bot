@@ -1,25 +1,30 @@
 package fi.sundae.bot.tournament;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.Objects;
 
 public class Player {
   @SerializedName("auth_provider")
   private String authProvider;
+
   @SerializedName("auth_provider_id")
   private String authProviderId;
+
   @SerializedName("auth_wallet")
   private String authWallet;
+
   @SerializedName("auth_name")
   private String authName;
 
   @SerializedName("auth_email")
   private String authEmail;
+
   @SerializedName("auth_avatar")
   private String authAvatar;
+
   @SerializedName("linked_wallet_stake_address")
   private String linkedWalletStakeAddress;
+
   @SerializedName("linked_discord_account")
   private DiscordAccount linkedDiscordAccount;
 
@@ -88,20 +93,27 @@ public class Player {
       return false;
     }
     Player player = (Player) o;
-    return Objects.equals(authProvider, player.authProvider) &&
-           Objects.equals(authProviderId, player.authProviderId) &&
-           Objects.equals(authWallet, player.authWallet) &&
-           Objects.equals(authName, player.authName) && Objects.equals(authEmail, player.authEmail) &&
-           Objects.equals(authAvatar, player.authAvatar) &&
-           Objects.equals(linkedWalletStakeAddress, player.linkedWalletStakeAddress) &&
-           Objects.equals(linkedDiscordAccount, player.linkedDiscordAccount);
+    return Objects.equals(authProvider, player.authProvider)
+        && Objects.equals(authProviderId, player.authProviderId)
+        && Objects.equals(authWallet, player.authWallet)
+        && Objects.equals(authName, player.authName)
+        && Objects.equals(authEmail, player.authEmail)
+        && Objects.equals(authAvatar, player.authAvatar)
+        && Objects.equals(linkedWalletStakeAddress, player.linkedWalletStakeAddress)
+        && Objects.equals(linkedDiscordAccount, player.linkedDiscordAccount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authProvider, authProviderId, authWallet, authName, authEmail, authAvatar,
-                        linkedWalletStakeAddress, linkedDiscordAccount
-    );
+    return Objects.hash(
+        authProvider,
+        authProviderId,
+        authWallet,
+        authName,
+        authEmail,
+        authAvatar,
+        linkedWalletStakeAddress,
+        linkedDiscordAccount);
   }
 
   public static class DiscordAccount {
@@ -137,6 +149,4 @@ public class Player {
       return Objects.hash(id, name);
     }
   }
-
-
 }

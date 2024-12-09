@@ -1,7 +1,7 @@
 package fi.sundae.bot.tournament;
 
 import com.google.gson.*;
-
+import fi.sundae.bot.api.Competitor;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,8 +11,6 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import fi.sundae.bot.api.Competitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,13 +86,14 @@ public class QualifierRepository {
   private Optional<Player> fetchPlayer(String reference) {
     try (HttpClient client = HttpClient.newHttpClient()) {
       HttpRequest request =
-              HttpRequest.newBuilder()
-                         .uri(
-                                 new URI(
-                                         "https://rewardengine.dripdropz" +
-                                         ".io/api/v1/auth/info/d93212b3-dbdc-40d0-befd-f90508c6232d/?reference=%s".formatted(reference)))
-                         .GET()
-                         .build();
+          HttpRequest.newBuilder()
+              .uri(
+                  new URI(
+                      "https://rewardengine.dripdropz"
+                          + ".io/api/v1/auth/info/d93212b3-dbdc-40d0-befd-f90508c6232d/?reference=%s"
+                              .formatted(reference)))
+              .GET()
+              .build();
 
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() == 200) {

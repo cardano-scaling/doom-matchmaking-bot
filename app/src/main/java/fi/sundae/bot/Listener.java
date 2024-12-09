@@ -46,7 +46,13 @@ public class Listener extends ListenerAdapter {
         event
             .getGuild()
             .getRoleById(
-                qualifiedUsers.stream().anyMatch(player -> event.getMember().getId().equals(player.getLinkedDiscordAccount().getId()))
+                qualifiedUsers.stream()
+                        .anyMatch(
+                            player ->
+                                event
+                                    .getMember()
+                                    .getId()
+                                    .equals(player.getLinkedDiscordAccount().getId()))
                     ? QUALIFIED_ROLE_ID
                     : FAN_ROLE_ID);
     if (role == null) {

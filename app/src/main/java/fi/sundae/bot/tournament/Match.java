@@ -63,22 +63,38 @@ public class Match {
 
   public MessageEmbed toEndEmbed(int playerOneKills, int playerTwoKills) {
     String description;
-    if(playerOneKills > playerTwoKills) description = """
+    if (playerOneKills > playerTwoKills)
+      description =
+          """
                                                       Game over! <@%s> has defeated <@%s>
-                                                      """.formatted(getPlayerOne(), getPlayerTwo());
-    else if (playerTwoKills > playerOneKills) description = """
+                                                      """
+              .formatted(getPlayerOne(), getPlayerTwo());
+    else if (playerTwoKills > playerOneKills)
+      description =
+          """
                                                             Game over! <@%s> has defeated <@%s>
-                                                            """.formatted(getPlayerTwo(), getPlayerOne());
-    else description = """
+                                                            """
+              .formatted(getPlayerTwo(), getPlayerOne());
+    else
+      description =
+          """
                        Game over! <@%s> and <@%s> are evenly matched and no one won
-                       """.formatted(getPlayerTwo(), getPlayerTwo());
+                       """
+              .formatted(getPlayerTwo(), getPlayerTwo());
 
-    return new EmbedBuilder().setColor(Color.GREEN).setTitle("Match Over").setDescription(description)
-                             .addField("Kill Counts", """
+    return new EmbedBuilder()
+        .setColor(Color.GREEN)
+        .setTitle("Match Over")
+        .setDescription(description)
+        .addField(
+            "Kill Counts",
+            """
                                                      <@%s>: `%s`
                                                      <@%s>: `%s
-                                                     """.formatted(getPlayerOne(), getPlayerTwo(), playerOneKills,
-                                                                   playerTwoKills), false).build();
+                                                     """
+                .formatted(getPlayerOne(), getPlayerTwo(), playerOneKills, playerTwoKills),
+            false)
+        .build();
   }
 
   public String getJoinLink() {

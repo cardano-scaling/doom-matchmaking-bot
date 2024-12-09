@@ -42,7 +42,9 @@ public class ReadyCommand extends SlashCommand {
       return;
     }
 
-    if (qualifiedUsers.stream().noneMatch(player -> event.getMember().getId().equals(player.getLinkedDiscordAccount().getId()))) {
+    if (qualifiedUsers.stream()
+        .noneMatch(
+            player -> event.getMember().getId().equals(player.getLinkedDiscordAccount().getId()))) {
       event.getHook().editOriginalEmbeds(getPermissionDeniedEmbed()).queue();
       return;
     }

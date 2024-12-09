@@ -1,5 +1,6 @@
 package fi.sundae.bot.tournament;
 
+import fi.sundae.bot.api.MatchRequest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import net.dv8tion.jda.api.JDA;
@@ -8,7 +9,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fi.sundae.bot.api.MatchRequest;
 
 public class Matchmaker {
 
@@ -66,25 +66,39 @@ public class Matchmaker {
 
   public void endMatch(MatchRequest matchRequest, JDA jda) {
     Optional<Match> maybeMatch =
-            ACTIVE_MATCHES.stream().filter(activeMatch -> activeMatch.getCode().equals(matchRequest.getGameId())).findFirst();
+        ACTIVE_MATCHES.stream()
+            .filter(activeMatch -> activeMatch.getCode().equals(matchRequest.getGameId()))
+            .findFirst();
 
-    if(maybeMatch.isEmpty()) return;
+    if (maybeMatch.isEmpty()) return;
     Match match = maybeMatch.get();
     ACTIVE_MATCHES.remove(match);
-    Optional<Player> maybePlayerA = QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerOne());
-    Optional<Player> maybePlayerB = QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerTwo());
-    if(maybePlayerA.isEmpty() || maybePlayerB.isEmpty()) return;
+    Optional<Player> maybePlayerA =
+        QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerOne());
+    Optional<Player> maybePlayerB =
+        QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerTwo());
+    if (maybePlayerA.isEmpty() || maybePlayerB.isEmpty()) return;
     Player playerA = maybePlayerA.get();
 
-    if(playerA.getLinkedDiscordAccount().getId().equals(match.getPlayerOne())) announceMatchEnd(match, jda, matchRequest.getPlayerOne().getKillCount(), matchRequest.getPlayerTwo().getKillCount());
-    else announceMatchEnd(match, jda, matchRequest.getPlayerTwo().getKillCount(), matchRequest.getPlayerOne().getKillCount());
+    if (playerA.getLinkedDiscordAccount().getId().equals(match.getPlayerOne()))
+      announceMatchEnd(
+          match,
+          jda,
+          matchRequest.getPlayerOne().getKillCount(),
+          matchRequest.getPlayerTwo().getKillCount());
+    else
+      announceMatchEnd(
+          match,
+          jda,
+          matchRequest.getPlayerTwo().getKillCount(),
+          matchRequest.getPlayerOne().getKillCount());
   }
 
   public void announceMatchEnd(Match match, JDA jda, int playerOneKills, int playerTwoKills) {
     MessageCreateData msg =
-            new MessageCreateBuilder()
-                    .addEmbeds(match.toEndEmbed(playerOneKills, playerTwoKills))
-                    .build();
+        new MessageCreateBuilder()
+            .addEmbeds(match.toEndEmbed(playerOneKills, playerTwoKills))
+            .build();
     TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
     channel.sendMessage(msg).queue();
   }
