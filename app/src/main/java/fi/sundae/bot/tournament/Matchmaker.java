@@ -8,9 +8,14 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import fi.sundae.bot.api.MatchRequest;
 
 public class Matchmaker {
+
+  private final QualifierRepository QUALIFIER_REPOSITORY = new QualifierRepository();
   private final ConcurrentHashMap<Region, List<String>> REGISTERED_USERS;
+
+  private final List<Match> ACTIVE_MATCHES = new ArrayList<>();
   private final String CHANNEL_ID;
   private final Logger LOGGER = LoggerFactory.getLogger(Matchmaker.class);
 
@@ -32,17 +37,56 @@ public class Matchmaker {
     return matches;
   }
 
-  public void announceMatches(List<Match> matches, JDA jda) {
+  public void announceMatchesStart(List<Match> matches, JDA jda) {
     for (Match match : matches) {
-      MessageCreateData msg =
-          new MessageCreateBuilder()
-              .addContent(match.toMessage())
-              .addEmbeds(match.toMessageEmbed())
-              .build();
-      Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID))
-          .sendMessage(msg)
-          .queue();
+      announceMatchStart(match, jda);
     }
+  }
+
+  public void announceMatchStart(Match match, JDA jda) {
+    MessageCreateData msg =
+        new MessageCreateBuilder()
+            .addContent(match.toMessage())
+            .addEmbeds(match.toNewEmbed())
+            .build();
+    TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
+    channel.sendMessage(msg).queue();
+    channel
+        .createThreadChannel("Game ID: " + match.getCode(), true)
+        .queue(
+            thread -> {
+              thread.addThreadMemberById(match.getPlayerOne()).queue();
+              thread.addThreadMemberById(match.getPlayerTwo()).queue();
+              thread
+                  .sendMessageEmbeds(match.toConnectionEmbed())
+                  .addActionRow(match.getConnectionButton())
+                  .queue();
+            });
+  }
+
+  public void endMatch(MatchRequest matchRequest, JDA jda) {
+    Optional<Match> maybeMatch =
+            ACTIVE_MATCHES.stream().filter(activeMatch -> activeMatch.getCode().equals(matchRequest.getGameId())).findFirst();
+
+    if(maybeMatch.isEmpty()) return;
+    Match match = maybeMatch.get();
+    ACTIVE_MATCHES.remove(match);
+    Optional<Player> maybePlayerA = QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerOne());
+    Optional<Player> maybePlayerB = QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerTwo());
+    if(maybePlayerA.isEmpty() || maybePlayerB.isEmpty()) return;
+    Player playerA = maybePlayerA.get();
+
+    if(playerA.getLinkedDiscordAccount().getId().equals(match.getPlayerOne())) announceMatchEnd(match, jda, matchRequest.getPlayerOne().getKillCount(), matchRequest.getPlayerTwo().getKillCount());
+    else announceMatchEnd(match, jda, matchRequest.getPlayerTwo().getKillCount(), matchRequest.getPlayerOne().getKillCount());
+  }
+
+  public void announceMatchEnd(Match match, JDA jda, int playerOneKills, int playerTwoKills) {
+    MessageCreateData msg =
+            new MessageCreateBuilder()
+                    .addEmbeds(match.toEndEmbed(playerOneKills, playerTwoKills))
+                    .build();
+    TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
+    channel.sendMessage(msg).queue();
   }
 
   public Optional<Match> buildMatch(Region r) {
@@ -67,7 +111,15 @@ public class Matchmaker {
         playerOne,
         playerTwo);
 
-    return Optional.of(new Match(playerOne, playerTwo, r));
+    try {
+      Match match = new Match(playerOne, playerTwo, r);
+      ACTIVE_MATCHES.add(match);
+
+      return Optional.of(match);
+    } catch (Exception e) {
+      LOGGER.error("Failed to create match", e);
+      return Optional.empty();
+    }
   }
 
   public ConcurrentHashMap<Region, List<String>> getUsers() {

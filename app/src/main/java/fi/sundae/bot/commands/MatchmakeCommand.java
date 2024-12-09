@@ -45,7 +45,8 @@ public class MatchmakeCommand extends SlashCommand {
     maybeRegion.ifPresentOrElse(
         region -> {
           Optional<Match> maybeMatch = MATCHMAKER.buildMatch(region);
-          maybeMatch.ifPresent(match -> MATCHMAKER.announceMatches(List.of(match), event.getJDA()));
+          maybeMatch.ifPresent(
+              match -> MATCHMAKER.announceMatchesStart(List.of(match), event.getJDA()));
           event
               .getHook()
               .editOriginal(
@@ -55,7 +56,7 @@ public class MatchmakeCommand extends SlashCommand {
         },
         () -> {
           List<Match> matches = MATCHMAKER.buildAllMatches();
-          MATCHMAKER.announceMatches(matches, event.getJDA());
+          MATCHMAKER.announceMatchesStart(matches, event.getJDA());
           event.getHook().editOriginal("Created a match if applicable in every region").queue();
         });
   }

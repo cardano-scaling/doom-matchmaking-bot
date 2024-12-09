@@ -1,9 +1,7 @@
 package fi.sundae.bot.tournament;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,13 +11,15 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import fi.sundae.bot.api.Competitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class QualifierRepository {
   private final Logger LOGGER = LoggerFactory.getLogger(QualifierRepository.class);
 
-  public List<String> getQualifiedDiscordAccounts() throws IOException {
+  public List<Player> getQualifiers() throws IOException {
     Optional<String> maybeBody = fetchQualifiers();
     if (maybeBody.isEmpty()) {
       throw new IOException("Failed to fetch qualifier data");
@@ -28,19 +28,22 @@ public class QualifierRepository {
     return parseAndFilterQualifiersResponseBody(maybeBody.get());
   }
 
-  private List<String> parseAndFilterQualifiersResponseBody(String body) {
-    List<String> discordIds = new ArrayList<>();
+  public Optional<Player> getPlayerFromCompetitor(Competitor competitor) {
+    return fetchPlayer(competitor.getPkh());
+  }
+
+  private List<Player> parseAndFilterQualifiersResponseBody(String body) {
+    List<Player> players = new ArrayList<>();
+    Gson gson = new Gson();
     try {
       JsonArray json = JsonParser.parseString(body).getAsJsonArray();
       for (JsonElement elem : json) {
         try {
-          JsonObject user = elem.getAsJsonObject();
-          if (user.get("linked_discord_account").isJsonNull()) {
+          Player player = gson.fromJson(elem, Player.class);
+          if (player.getLinkedDiscordAccount() == null) {
             continue;
           }
-          JsonObject discordObject = user.get("linked_discord_account").getAsJsonObject();
-          String discordId = discordObject.get("id").getAsString();
-          discordIds.add(discordId);
+          players.add(player);
         } catch (IllegalStateException e) {
           LOGGER.info("Invalid JSON formatting for a qualifier: {}", elem, e);
         }
@@ -49,7 +52,7 @@ public class QualifierRepository {
       LOGGER.info("Invalid JSON formatting", e);
     }
 
-    return discordIds;
+    return players;
   }
 
   private Optional<String> fetchQualifiers() {
@@ -78,6 +81,33 @@ public class QualifierRepository {
       return Optional.empty();
     } catch (InterruptedException e) {
       LOGGER.error("Failed to fetch qualifiers: Interrupted Exception", e);
+      return Optional.empty();
+    }
+  }
+
+  private Optional<Player> fetchPlayer(String reference) {
+    try (HttpClient client = HttpClient.newHttpClient()) {
+      HttpRequest request =
+              HttpRequest.newBuilder()
+                         .uri(
+                                 new URI(
+                                         "https://rewardengine.dripdropz" +
+                                         ".io/api/v1/auth/info/d93212b3-dbdc-40d0-befd-f90508c6232d/?reference=%s".formatted(reference)))
+                         .GET()
+                         .build();
+
+      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      if (response.statusCode() == 200) {
+        Gson gson = new Gson();
+        JsonObject body = JsonParser.parseString(response.body()).getAsJsonObject();
+        Player player = gson.fromJson(body.get("account"), Player.class);
+        return Optional.of(player);
+      }
+
+      LOGGER.info("None 200 status code when fetching player. Status: {}", response.statusCode());
+      return Optional.empty();
+    } catch (URISyntaxException | IOException | InterruptedException e) {
+      LOGGER.error("Failed to fetch player", e);
       return Optional.empty();
     }
   }

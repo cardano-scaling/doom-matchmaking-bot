@@ -3,6 +3,7 @@ package fi.sundae.bot.commands;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import fi.sundae.bot.tournament.Matchmaker;
+import fi.sundae.bot.tournament.Player;
 import fi.sundae.bot.tournament.QualifierRepository;
 import fi.sundae.bot.tournament.Region;
 import java.awt.*;
@@ -33,15 +34,15 @@ public class ReadyCommand extends SlashCommand {
     event.deferReply(true).queue();
 
     Member member = Objects.requireNonNull(event.getMember());
-    List<String> qualifiedUsers;
+    List<Player> qualifiedUsers;
     try {
-      qualifiedUsers = QUALIFIER_REPOSITORY.getQualifiedDiscordAccounts();
+      qualifiedUsers = QUALIFIER_REPOSITORY.getQualifiers();
     } catch (IOException e) {
       event.getHook().editOriginalEmbeds(getErrorEmbed()).queue();
       return;
     }
 
-    if (qualifiedUsers.contains(member.getId())) {
+    if (qualifiedUsers.stream().noneMatch(player -> event.getMember().getId().equals(player.getLinkedDiscordAccount().getId()))) {
       event.getHook().editOriginalEmbeds(getPermissionDeniedEmbed()).queue();
       return;
     }

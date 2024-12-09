@@ -32,7 +32,7 @@ public class Bot {
             .setStatus(OnlineStatus.ONLINE)
             .addSlashCommands(
                 new ReadyCommand(MATCHMAKER), new MatchmakeCommand(adminRoleId, MATCHMAKER));
-    jdaBuilder.addEventListeners(commandBuilder.build(), new Listener());
+    jdaBuilder.addEventListeners(commandBuilder.build(), new Listener(MATCHMAKER));
 
     JDA jda = jdaBuilder.build();
     scheduleMatchmaking(jda);
@@ -43,7 +43,7 @@ public class Bot {
       executor.scheduleAtFixedRate(
           () -> {
             List<Match> matches = MATCHMAKER.buildAllMatches();
-            MATCHMAKER.announceMatches(matches, jda);
+            MATCHMAKER.announceMatchesStart(matches, jda);
           },
           0,
           10,
