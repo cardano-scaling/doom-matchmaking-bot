@@ -40,13 +40,13 @@ public class Bot {
 
   private void scheduleMatchmaking(JDA jda) {
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-      executor.scheduleAtFixedRate(
-          () -> {
-            List<Match> matches = MATCHMAKER.buildAllMatches();
-            MATCHMAKER.announceMatchesStart(matches, jda);
-          },
-          0,
-          5,
-          TimeUnit.MINUTES);
+    executor.scheduleAtFixedRate(
+        () -> {
+          List<Match> matches = MATCHMAKER.buildAllMatches();
+          MATCHMAKER.announceMatchesStart(matches, jda);
+        },
+        0,
+        5,
+        TimeUnit.MINUTES);
   }
 }
