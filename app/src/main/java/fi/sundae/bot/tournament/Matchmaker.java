@@ -73,11 +73,11 @@ public class Matchmaker {
   public void endMatch(MatchRequest matchRequest, JDA jda) {
     Optional<Match> maybeMatch =
         ACTIVE_MATCHES.stream()
-            .filter(activeMatch -> matchRequest.getGameId().equals(activeMatch.getCode()))
+            .filter(activeMatch -> matchRequest.getGameId().equals(activeMatch.getGameTxHash()))
             .findFirst();
 
     if (maybeMatch.isEmpty()) {
-      LOGGER.info("Match {} is not in ACTIVE_MATCHES", matchRequest.getGameTxHash());
+      LOGGER.info("Match {} is not in ACTIVE_MATCHES", matchRequest.getGameId());
       return;
     }
     Match match = maybeMatch.get();
@@ -85,15 +85,15 @@ public class Matchmaker {
     match.getThread().delete().queue();
 
     if (matchRequest.getResult() == MatchResult.TIMEOUT) {
-      LOGGER.info("Match {} is over due to timeout", matchRequest.getGameTxHash());
+      LOGGER.info("Match {} is over due to timeout", matchRequest.getGameId());
       announceMatchTimeout(match, jda);
       return;
     } else if (matchRequest.getResult() == MatchResult.DISAGREEMENT) {
-      LOGGER.info("Match {} is over due to disagreement", matchRequest.getGameTxHash());
+      LOGGER.info("Match {} is over due to disagreement", matchRequest.getGameId());
       announceMatchDisagreement(match, jda);
       return;
     } else if (matchRequest.getResult() == MatchResult.DISCONNECT) {
-      LOGGER.info("Match {} is over due to disconnect", matchRequest.getGameTxHash());
+      LOGGER.info("Match {} is over due to disconnect", matchRequest.getGameId());
       announceMatchDisconnect(match, jda);
       return;
     }
