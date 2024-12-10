@@ -11,6 +11,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class Match {
@@ -18,6 +19,7 @@ public class Match {
   private final String PLAYER_TWO;
   private final Region REGION;
   private final String CODE;
+  private ThreadChannel thread;
 
   public Match(String playerOne, String playerTwo, Region region)
       throws URISyntaxException, IOException, InterruptedException {
@@ -71,7 +73,7 @@ public class Match {
         .build();
   }
 
-  public MessageEmbed toDisagerementEmbed() {
+  public MessageEmbed toDisagreementEmbed() {
     return new EmbedBuilder()
             .setColor(Color.RED)
             .setTitle("Match Disagreement")
@@ -157,6 +159,14 @@ public class Match {
 
   public String getCode() {
     return CODE;
+  }
+
+  public void setThread(ThreadChannel thread) {
+    this.thread = thread;
+  }
+
+  public ThreadChannel getThread() {
+    return this.thread;
   }
 
   @Override

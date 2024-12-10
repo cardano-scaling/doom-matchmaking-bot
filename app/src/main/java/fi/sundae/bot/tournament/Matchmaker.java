@@ -51,7 +51,6 @@ public class Matchmaker {
             .addContent(match.toMessage())
             .addEmbeds(match.toNewEmbed())
             .build();
-    jda.getGuilds().forEach(guild -> System.out.println("guild " + guild.getName()));
     TextChannel channel = jda.getTextChannelById(CHANNEL_ID);
     if (channel == null) {
       LOGGER.error("NULL channel for ID {}", CHANNEL_ID);
@@ -68,6 +67,7 @@ public class Matchmaker {
                   .sendMessageEmbeds(match.toConnectionEmbed())
                   .addActionRow(match.getConnectionButton())
                   .queue();
+              match.setThread(thread);
             });
   }
 
@@ -80,6 +80,7 @@ public class Matchmaker {
     if (maybeMatch.isEmpty()) return;
     Match match = maybeMatch.get();
     ACTIVE_MATCHES.remove(match);
+    match.getThread().delete().queue();
 
     if (matchRequest.getResult() == MatchResult.TIMEOUT) {
       announceMatchTimeout(match, jda);
@@ -126,7 +127,7 @@ public class Matchmaker {
   }
 
   private void announceMatchDisagreement(Match match, JDA jda) {
-    MessageCreateData msg = new MessageCreateBuilder().addEmbeds(match.toDisagerementEmbed()).build();
+    MessageCreateData msg = new MessageCreateBuilder().addEmbeds(match.toDisagreementEmbed()).build();
     TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
     channel.sendMessage(msg).queue();
   }
