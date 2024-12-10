@@ -1,7 +1,7 @@
 package fi.sundae.bot.tournament;
 
 public enum Region {
-  AFRICA("af-south-1", "Africa"),
+  ASIA("ap-southeast-1", "Asia"),
   EUROPE("eu-central-1", "Europe"),
   SOUTH_AMERICA("sa-east-1", "South America"),
   US_EAST("us-east-1", "US East"),
