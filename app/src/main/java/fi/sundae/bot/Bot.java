@@ -39,7 +39,7 @@ public class Bot {
   }
 
   private void scheduleMatchmaking(JDA jda) {
-    try (ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
+    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
       executor.scheduleAtFixedRate(
           () -> {
             List<Match> matches = MATCHMAKER.buildAllMatches();
@@ -48,6 +48,5 @@ public class Bot {
           0,
           5,
           TimeUnit.MINUTES);
-    }
   }
 }
