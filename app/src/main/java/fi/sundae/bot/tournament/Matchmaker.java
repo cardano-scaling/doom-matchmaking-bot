@@ -88,6 +88,8 @@ public class Matchmaker {
     } else if (matchRequest.getResult() == MatchResult.DISAGREEMENT) {
       announceMatchDisagreement(match, jda);
       return;
+    } else if (matchRequest.getResult() == MatchResult.DISCONNECT) {
+      announceMatchDisconnect(match, jda);
     }
 
     Optional<Player> maybePlayerA =
@@ -132,6 +134,14 @@ public class Matchmaker {
     TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
     channel.sendMessage(msg).queue();
   }
+
+  private void announceMatchDisconnect(Match match, JDA jda) {
+    MessageCreateData msg =
+            new MessageCreateBuilder().addEmbeds(match.toDisconnectEmbed()).build();
+    TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
+    channel.sendMessage(msg).queue();
+  }
+
 
   public Optional<Match> buildMatch(
       Region r, Optional<User> maybePlayerOne, Optional<User> maybePlayerTwo) {

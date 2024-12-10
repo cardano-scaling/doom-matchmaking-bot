@@ -89,6 +89,21 @@ public class Match {
         .build();
   }
 
+  public MessageEmbed toDisconnectEmbed() {
+    return new EmbedBuilder()
+            .setColor(Color.RED)
+            .setTitle("Match Disconnect")
+            .setDescription(
+                    """
+                            The match between <@%s> and <@%s> has failed due to a player disconnect. Any kills during the match have been discarded
+                            """
+                            .formatted(getPlayerOne(), getPlayerTwo()))
+            .addField("Game ID", "`%s`".formatted(this.CODE), true)
+            .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
+            .build();
+  }
+
+
   public MessageEmbed toEndEmbed(int playerOneKills, int playerTwoKills) {
     String description;
     if (playerOneKills > playerTwoKills)
