@@ -85,7 +85,7 @@ public class Matchmaker {
     match.getThread().delete().queue();
 
     if (matchRequest.getResult() == MatchResult.TIMEOUT) {
-      LOGGER.info("Match {} is over due to timeout",  matchRequest.getGameTxHash());
+      LOGGER.info("Match {} is over due to timeout", matchRequest.getGameTxHash());
       announceMatchTimeout(match, jda);
       return;
     } else if (matchRequest.getResult() == MatchResult.DISAGREEMENT) {
@@ -103,8 +103,11 @@ public class Matchmaker {
     Optional<Player> maybePlayerB =
         QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerTwo());
     if (maybePlayerA.isEmpty() || maybePlayerB.isEmpty()) {
-      LOGGER.info("At least one competitor is not a qualified player | maybePlayerA.isPresent: {} | maybePlayerB" +
-                  ".isPresent: {}", maybePlayerA.isPresent(), maybePlayerB.isPresent());
+      LOGGER.info(
+          "At least one competitor is not a qualified player | maybePlayerA.isPresent: {} | maybePlayerB"
+              + ".isPresent: {}",
+          maybePlayerA.isPresent(),
+          maybePlayerB.isPresent());
       return;
     }
     Player playerA = maybePlayerA.get();
