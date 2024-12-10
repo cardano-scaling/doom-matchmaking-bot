@@ -1,11 +1,10 @@
 package fi.sundae.bot.tournament;
 
 import fi.sundae.bot.api.MatchRequest;
+import fi.sundae.bot.api.MatchResult;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
-import fi.sundae.bot.api.MatchResult;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -127,12 +126,14 @@ public class Matchmaker {
   }
 
   private void announceMatchDisagreement(Match match, JDA jda) {
-    MessageCreateData msg = new MessageCreateBuilder().addEmbeds(match.toDisagreementEmbed()).build();
+    MessageCreateData msg =
+        new MessageCreateBuilder().addEmbeds(match.toDisagreementEmbed()).build();
     TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
     channel.sendMessage(msg).queue();
   }
 
-  public Optional<Match> buildMatch(Region r, Optional<User> maybePlayerOne, Optional<User> maybePlayerTwo) {
+  public Optional<Match> buildMatch(
+      Region r, Optional<User> maybePlayerOne, Optional<User> maybePlayerTwo) {
     List<User> users = new ArrayList<>(REGISTERED_USERS.get(r));
     LOGGER.info("building match for {} | Player count: {}", r.getRegionName(), users.size());
     if (users.size() < 2) {

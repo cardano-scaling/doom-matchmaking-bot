@@ -25,7 +25,9 @@ public class MatchHandler implements Handler {
   public void handle(@NotNull Context ctx) {
     LOGGER.info("received a new request: {}", ctx.body());
 
-    Gson gson = new GsonBuilder()    .registerTypeAdapter(MatchResult.class, new MatchResultDeserializer())
+    Gson gson =
+        new GsonBuilder()
+            .registerTypeAdapter(MatchResult.class, new MatchResultDeserializer())
             .create();
     MatchRequest request = gson.fromJson(ctx.body(), MatchRequest.class);
     MATCHMAKER.endMatch(request, JDA);

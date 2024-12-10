@@ -75,15 +75,15 @@ public class Match {
 
   public MessageEmbed toDisagreementEmbed() {
     return new EmbedBuilder()
-            .setColor(Color.RED)
-            .setTitle("Match Disagreement")
-            .setDescription(
-                    """
+        .setColor(Color.RED)
+        .setTitle("Match Disagreement")
+        .setDescription(
+            """
                     The match between <@%s> and <@%s> has failed due to a disagreement in state. Any kills during the match have been discarded
                     """
-                            .formatted(getPlayerOne(), getPlayerTwo()))
-            .addField("Game ID", "`%s`".formatted(this.CODE), true)
-            .build();
+                .formatted(getPlayerOne(), getPlayerTwo()))
+        .addField("Game ID", "`%s`".formatted(this.CODE), true)
+        .build();
   }
 
   public MessageEmbed toEndEmbed(int playerOneKills, int playerTwoKills) {
