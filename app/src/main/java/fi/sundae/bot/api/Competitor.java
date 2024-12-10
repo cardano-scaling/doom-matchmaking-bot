@@ -2,7 +2,7 @@ package fi.sundae.bot.api;
 
 public class Competitor {
   private String pkh;
-  private int killCount;
+  private int kills;
 
   public Competitor() {}
 
@@ -14,11 +14,11 @@ public class Competitor {
     return pkh;
   }
 
-  public void setKillCount(int killCount) {
-    this.killCount = killCount;
+  public void setKills(int kills) {
+    this.kills = kills;
   }
 
-  public int getKillCount() {
-    return killCount;
+  public int getKills() {
+    return kills;
   }
 }

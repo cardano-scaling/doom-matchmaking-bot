@@ -116,14 +116,14 @@ public class Matchmaker {
       announceMatchEnd(
           match,
           jda,
-          matchRequest.getPlayerOne().getKillCount(),
-          matchRequest.getPlayerTwo().getKillCount());
+          matchRequest.getPlayerOne().getKills(),
+          matchRequest.getPlayerTwo().getKills());
     else
       announceMatchEnd(
           match,
           jda,
-          matchRequest.getPlayerTwo().getKillCount(),
-          matchRequest.getPlayerOne().getKillCount());
+          matchRequest.getPlayerTwo().getKills(),
+          matchRequest.getPlayerOne().getKills());
   }
 
   private void announceMatchEnd(Match match, JDA jda, int playerOneKills, int playerTwoKills) {
