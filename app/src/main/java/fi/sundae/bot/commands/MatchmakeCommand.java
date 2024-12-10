@@ -55,7 +55,7 @@ public class MatchmakeCommand extends SlashCommand {
     maybeRegion.ifPresentOrElse(
         region -> {
           Optional<Match> maybeMatch =
-              MATCHMAKER.buildMatch(region, Optional.empty(), Optional.empty());
+              MATCHMAKER.buildMatch(region, maybePlayerOne, maybePlayerTwo);
           maybeMatch.ifPresent(
               match -> MATCHMAKER.announceMatchesStart(List.of(match), event.getJDA()));
           event
@@ -76,16 +76,14 @@ public class MatchmakeCommand extends SlashCommand {
     return new EmbedBuilder()
         .setColor(Color.RED)
         .setTitle("Permission Denied")
-        .setDescription("Only a tournament " + "admin can use this " + "command.")
+        .setDescription("Only a tournament admin can use this command.")
         .build();
   }
 
   private List<OptionData> getCommandOptions() {
     OptionData regionOption =
         new OptionData(
-            OptionType.STRING,
-            "region",
-            "Specify the region in which you'd like to " + "play a match");
+            OptionType.STRING, "region", "Specify the region in which you'd like to play a match");
 
     for (Region r : Region.values()) {
       regionOption.addChoice(r.getPrettyName(), r.getRegionName());

@@ -79,6 +79,7 @@ public class Matchmaker {
     if (maybeMatch.isEmpty()) return;
     Match match = maybeMatch.get();
     ACTIVE_MATCHES.remove(match);
+    match.setGameTxHash(matchRequest.getGameTxHash());
     match.getThread().delete().queue();
 
     if (matchRequest.getResult() == MatchResult.TIMEOUT) {

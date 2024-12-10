@@ -2,6 +2,7 @@ package fi.sundae.bot.api;
 
 public class MatchRequest {
   private String gameId;
+  private String gameTxHash;
   private Competitor competitorOne;
   private Competitor competitorTwo;
   private MatchResult result;
@@ -38,5 +39,13 @@ public class MatchRequest {
 
   public Competitor getPlayerTwo() {
     return competitorTwo;
+  }
+
+  public void setGameTxHash(String gameTxHash) {
+    this.gameTxHash = gameTxHash;
+  }
+
+  public String getGameTxHash() {
+    return gameTxHash;
   }
 }

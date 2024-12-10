@@ -20,6 +20,7 @@ public class Match {
   private final Region REGION;
   private final String CODE;
   private ThreadChannel thread;
+  private String gameTxHash;
 
   public Match(String playerOne, String playerTwo, Region region)
       throws URISyntaxException, IOException, InterruptedException {
@@ -69,7 +70,8 @@ public class Match {
             The match between <@%s> and <@%s> has failed to complete. Any kills during the match have been discarded
             """
                 .formatted(getPlayerOne(), getPlayerTwo()))
-        .addField("Game ID", "`%s`".formatted(this.CODE), true)
+        .addField("Node ID", "`%s`".formatted(this.CODE), true)
+        .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
         .build();
   }
 
@@ -83,6 +85,7 @@ public class Match {
                     """
                 .formatted(getPlayerOne(), getPlayerTwo()))
         .addField("Game ID", "`%s`".formatted(this.CODE), true)
+        .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
         .build();
   }
 
@@ -119,6 +122,8 @@ public class Match {
                                                      """
                 .formatted(getPlayerOne(), playerOneKills, getPlayerTwo(), playerTwoKills),
             false)
+        .addField("Node ID", "`%s`".formatted(this.CODE), true)
+        .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
         .build();
   }
 
@@ -167,6 +172,14 @@ public class Match {
 
   public ThreadChannel getThread() {
     return this.thread;
+  }
+
+  public void setGameTxHash(String gameTxHash) {
+    this.gameTxHash = gameTxHash;
+  }
+
+  public String getGameTxHash() {
+    return gameTxHash;
   }
 
   @Override
