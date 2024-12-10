@@ -2,8 +2,8 @@ package fi.sundae.bot.api;
 
 public class MatchRequest {
   private String gameId;
-  private Competitor competitorOne;
-  private Competitor competitorTwo;
+  private Competitor playerOne;
+  private Competitor playerTwo;
   private MatchResult result;
 
   public MatchRequest() {}
@@ -16,16 +16,16 @@ public class MatchRequest {
     return gameId;
   }
 
-  public void setPlayerOne(Competitor competitorOne) {
-    this.competitorOne = competitorOne;
+  public void setPlayerOne(Competitor playerOne) {
+    this.playerOne = playerOne;
   }
 
   public Competitor getPlayerOne() {
-    return competitorOne;
+    return playerOne;
   }
 
-  public void setPlayerTwo(Competitor competitorTwo) {
-    this.competitorTwo = competitorTwo;
+  public void setPlayerTwo(Competitor playerTwo) {
+    this.playerTwo = playerTwo;
   }
 
   public MatchResult getResult() {
@@ -37,6 +37,6 @@ public class MatchRequest {
   }
 
   public Competitor getPlayerTwo() {
-    return competitorTwo;
+    return playerTwo;
   }
 }
