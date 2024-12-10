@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Match {
   private final String PLAYER_ONE;
@@ -21,6 +23,7 @@ public class Match {
   private final String CODE;
   private ThreadChannel thread;
   private String gameTxHash;
+  private final Logger LOGGER = LoggerFactory.getLogger(Match.class);
 
   public Match(String playerOne, String playerTwo, Region region)
       throws URISyntaxException, IOException, InterruptedException {
@@ -41,6 +44,7 @@ public class Match {
 
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() == 200) {
+        LOGGER.info("/elimination response: {}", response.body());
         JsonObject body = JsonParser.parseString(response.body()).getAsJsonObject();
         String gameId = body.get("game_id").getAsString();
         String gameTxHash = body.get("game_tx_hash").getAsString();
