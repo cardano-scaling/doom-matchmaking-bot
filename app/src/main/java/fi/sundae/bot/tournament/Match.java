@@ -27,10 +27,13 @@ public class Match {
     this.PLAYER_ONE = playerOne;
     this.PLAYER_TWO = playerTwo;
     this.REGION = region;
-    this.CODE = requestNewGame();
+    var newGameData = requestNewGame();
+    assert newGameData != null;
+    this.CODE = newGameData[0];
+    this.gameTxHash = newGameData[1];
   }
 
-  private String requestNewGame() throws URISyntaxException, IOException, InterruptedException {
+  private String[] requestNewGame() throws URISyntaxException, IOException, InterruptedException {
     try (HttpClient client = HttpClient.newHttpClient()) {
       String url =
           "https://api.%s.hydra-doom.sundae.fi/elimination".formatted(REGION.getRegionName());
@@ -39,7 +42,10 @@ public class Match {
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() == 200) {
         JsonObject body = JsonParser.parseString(response.body()).getAsJsonObject();
-        return body.get("game_id").getAsString();
+        String gameId = body.get("game_id").getAsString();
+        String gameTxHash = body.get("game_tx_hash").getAsString();
+
+        return new String[] {gameId, gameTxHash};
       }
 
       System.out.printf("Request to %s failed with status code: %s%n", url, response.statusCode());
@@ -57,7 +63,8 @@ public class Match {
         .setColor(Color.GREEN)
         .setTitle("Connection Information")
         .setDescription("Your match is ready for you! Click the button below to join the game.")
-        .addField("Game ID", "`%s`".formatted(this.CODE), true)
+        .addField("Node ID", "`%s`".formatted(this.CODE), true)
+        .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
         .build();
   }
 
@@ -91,18 +98,17 @@ public class Match {
 
   public MessageEmbed toDisconnectEmbed() {
     return new EmbedBuilder()
-            .setColor(Color.RED)
-            .setTitle("Match Disconnect")
-            .setDescription(
-                    """
+        .setColor(Color.RED)
+        .setTitle("Match Disconnect")
+        .setDescription(
+            """
                             The match between <@%s> and <@%s> has failed due to a player disconnect. Any kills during the match have been discarded
                             """
-                            .formatted(getPlayerOne(), getPlayerTwo()))
-            .addField("Game ID", "`%s`".formatted(this.CODE), true)
-            .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
-            .build();
+                .formatted(getPlayerOne(), getPlayerTwo()))
+        .addField("Game ID", "`%s`".formatted(this.CODE), true)
+        .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
+        .build();
   }
-
 
   public MessageEmbed toEndEmbed(int playerOneKills, int playerTwoKills) {
     String description;
@@ -162,6 +168,7 @@ public class Match {
         .addField("Player 1", String.format("<@%s>", PLAYER_ONE), false)
         .addField("Player 2", String.format("<@%s>", PLAYER_TWO), false)
         .addField("Region", REGION.getPrettyName(), false)
+        .addField("Game ID", String.format("`%s`", gameTxHash), false)
         .build();
   }
 

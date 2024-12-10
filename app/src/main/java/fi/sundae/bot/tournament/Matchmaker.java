@@ -79,7 +79,6 @@ public class Matchmaker {
     if (maybeMatch.isEmpty()) return;
     Match match = maybeMatch.get();
     ACTIVE_MATCHES.remove(match);
-    match.setGameTxHash(matchRequest.getGameTxHash());
     match.getThread().delete().queue();
 
     if (matchRequest.getResult() == MatchResult.TIMEOUT) {
@@ -136,12 +135,10 @@ public class Matchmaker {
   }
 
   private void announceMatchDisconnect(Match match, JDA jda) {
-    MessageCreateData msg =
-            new MessageCreateBuilder().addEmbeds(match.toDisconnectEmbed()).build();
+    MessageCreateData msg = new MessageCreateBuilder().addEmbeds(match.toDisconnectEmbed()).build();
     TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
     channel.sendMessage(msg).queue();
   }
-
 
   public Optional<Match> buildMatch(
       Region r, Optional<User> maybePlayerOne, Optional<User> maybePlayerTwo) {
