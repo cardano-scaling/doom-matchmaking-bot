@@ -131,7 +131,7 @@ public class Match {
     else
       description =
           """
-                       Game over! <@%s> and <@%s> are evenly matched and no one won
+                       Game over! <@%s> and <@%s> are evenly matched!
                        """
               .formatted(getPlayerOne(), getPlayerTwo());
 
