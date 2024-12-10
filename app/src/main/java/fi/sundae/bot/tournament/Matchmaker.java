@@ -76,26 +76,37 @@ public class Matchmaker {
             .filter(activeMatch -> matchRequest.getGameId().equals(activeMatch.getCode()))
             .findFirst();
 
-    if (maybeMatch.isEmpty()) return;
+    if (maybeMatch.isEmpty()) {
+      LOGGER.info("Match {} is not in ACTIVE_MATCHES", matchRequest.getGameTxHash());
+      return;
+    }
     Match match = maybeMatch.get();
     ACTIVE_MATCHES.remove(match);
     match.getThread().delete().queue();
 
     if (matchRequest.getResult() == MatchResult.TIMEOUT) {
+      LOGGER.info("Match {} is over due to timeout",  matchRequest.getGameTxHash());
       announceMatchTimeout(match, jda);
       return;
     } else if (matchRequest.getResult() == MatchResult.DISAGREEMENT) {
+      LOGGER.info("Match {} is over due to disagreement", matchRequest.getGameTxHash());
       announceMatchDisagreement(match, jda);
       return;
     } else if (matchRequest.getResult() == MatchResult.DISCONNECT) {
+      LOGGER.info("Match {} is over due to disconnect", matchRequest.getGameTxHash());
       announceMatchDisconnect(match, jda);
+      return;
     }
 
     Optional<Player> maybePlayerA =
         QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerOne());
     Optional<Player> maybePlayerB =
         QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerTwo());
-    if (maybePlayerA.isEmpty() || maybePlayerB.isEmpty()) return;
+    if (maybePlayerA.isEmpty() || maybePlayerB.isEmpty()) {
+      LOGGER.info("At least one competitor is not a qualified player | maybePlayerA.isPresent: {} | maybePlayerB" +
+                  ".isPresent: {}", maybePlayerA.isPresent(), maybePlayerB.isPresent());
+      return;
+    }
     Player playerA = maybePlayerA.get();
 
     if (playerA.getLinkedDiscordAccount().getId().equals(match.getPlayerOne()))
