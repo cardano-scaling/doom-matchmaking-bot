@@ -9,6 +9,7 @@ public class API {
     Javalin.create()
         .post("/match", new MatchHandler(matchmaker, jda))
         .get("/readyPlayers", new ReadyPlayersHandler(matchmaker))
+        .get("/activeMatches", new ActiveMatchesHandler(matchmaker))
         .start();
   }
 }

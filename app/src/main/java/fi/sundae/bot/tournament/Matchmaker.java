@@ -212,4 +212,8 @@ public class Matchmaker {
 
     return userNamesInRegions;
   }
+
+  public List<Match> getActiveMatches() {
+    return ACTIVE_MATCHES;
+  }
 }

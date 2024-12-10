@@ -35,7 +35,7 @@ public class Bot {
     jdaBuilder.addEventListeners(commandBuilder.build(), new Listener(MATCHMAKER));
 
     JDA jda = jdaBuilder.build();
-    //    scheduleMatchmaking(jda);
+    scheduleMatchmaking(jda);
   }
 
   private void scheduleMatchmaking(JDA jda) {
@@ -46,7 +46,7 @@ public class Bot {
             MATCHMAKER.announceMatchesStart(matches, jda);
           },
           0,
-          10,
+          5,
           TimeUnit.MINUTES);
     }
   }
