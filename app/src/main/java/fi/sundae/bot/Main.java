@@ -10,6 +10,6 @@ public class Main {
     String channelId = env.get("CHANNEL_ID");
     String adminRoleId = env.get("ADMIN_ROLE_ID");
 
-    new Bot(token, channelId, ownerId, adminRoleId);
+    new Bot(token, ownerId, channelId, adminRoleId);
   }
 }

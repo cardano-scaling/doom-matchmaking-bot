@@ -13,6 +13,7 @@ import java.util.Objects;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -52,16 +53,16 @@ public class ReadyCommand extends SlashCommand {
     OptionMapping regionOption = Objects.requireNonNull(event.getOption("region"));
     Region region = Objects.requireNonNull(Region.fromRegionName(regionOption.getAsString()));
 
-    List<String> usersInRegion = MATCHMAKER.getUsers().get(region);
+    List<User> usersInRegion = MATCHMAKER.getUsers().get(region);
 
-    if (!usersInRegion.contains(member.getId())) {
-      usersInRegion.add(member.getId());
+    if (!usersInRegion.contains(member.getUser())) {
+      usersInRegion.add(member.getUser());
       MATCHMAKER.getUsers().put(region, usersInRegion);
       event.getHook().editOriginalEmbeds(getRegisteredEmbed(region.getPrettyName())).queue();
       return;
     }
 
-    usersInRegion.remove(member.getId());
+    usersInRegion.remove(member.getUser());
     event.getHook().editOriginalEmbeds(getDeregisteredEmbed(region.getPrettyName())).queue();
   }
 

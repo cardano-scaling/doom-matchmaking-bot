@@ -4,6 +4,7 @@ public class MatchRequest {
   private String gameId;
   private Competitor competitorOne;
   private Competitor competitorTwo;
+  private MatchResult result;
 
   public MatchRequest() {}
 
@@ -25,6 +26,14 @@ public class MatchRequest {
 
   public void setPlayerTwo(Competitor competitorTwo) {
     this.competitorTwo = competitorTwo;
+  }
+
+  public MatchResult getResult() {
+    return result;
+  }
+
+  public void setResult(MatchResult result) {
+    this.result = result;
   }
 
   public Competitor getPlayerTwo() {

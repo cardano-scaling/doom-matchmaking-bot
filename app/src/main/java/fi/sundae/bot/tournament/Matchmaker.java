@@ -3,7 +3,11 @@ package fi.sundae.bot.tournament;
 import fi.sundae.bot.api.MatchRequest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import fi.sundae.bot.api.MatchResult;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -11,10 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Matchmaker {
-
   private final QualifierRepository QUALIFIER_REPOSITORY = new QualifierRepository();
-  private final ConcurrentHashMap<Region, List<String>> REGISTERED_USERS;
-
+  private final ConcurrentHashMap<Region, List<User>> REGISTERED_USERS;
   private final List<Match> ACTIVE_MATCHES = new ArrayList<>();
   private final String CHANNEL_ID;
   private final Logger LOGGER = LoggerFactory.getLogger(Matchmaker.class);
@@ -31,7 +33,7 @@ public class Matchmaker {
     LOGGER.info("building matches for all regions");
     List<Match> matches = new ArrayList<>();
     for (Region r : Region.values()) {
-      buildMatch(r).ifPresent(matches::add);
+      buildMatch(r, Optional.empty(), Optional.empty()).ifPresent(matches::add);
     }
 
     return matches;
@@ -49,7 +51,12 @@ public class Matchmaker {
             .addContent(match.toMessage())
             .addEmbeds(match.toNewEmbed())
             .build();
-    TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
+    jda.getGuilds().forEach(guild -> System.out.println("guild " + guild.getName()));
+    TextChannel channel = jda.getTextChannelById(CHANNEL_ID);
+    if (channel == null) {
+      LOGGER.error("NULL channel for ID {}", CHANNEL_ID);
+      return;
+    }
     channel.sendMessage(msg).queue();
     channel
         .createThreadChannel("Game ID: " + match.getCode(), true)
@@ -67,12 +74,21 @@ public class Matchmaker {
   public void endMatch(MatchRequest matchRequest, JDA jda) {
     Optional<Match> maybeMatch =
         ACTIVE_MATCHES.stream()
-            .filter(activeMatch -> activeMatch.getCode().equals(matchRequest.getGameId()))
+            .filter(activeMatch -> matchRequest.getGameId().equals(activeMatch.getCode()))
             .findFirst();
 
     if (maybeMatch.isEmpty()) return;
     Match match = maybeMatch.get();
     ACTIVE_MATCHES.remove(match);
+
+    if (matchRequest.getResult() == MatchResult.TIMEOUT) {
+      announceMatchTimeout(match, jda);
+      return;
+    } else if (matchRequest.getResult() == MatchResult.DISAGREEMENT) {
+      announceMatchDisagreement(match, jda);
+      return;
+    }
+
     Optional<Player> maybePlayerA =
         QUALIFIER_REPOSITORY.getPlayerFromCompetitor(matchRequest.getPlayerOne());
     Optional<Player> maybePlayerB =
@@ -94,7 +110,7 @@ public class Matchmaker {
           matchRequest.getPlayerOne().getKillCount());
   }
 
-  public void announceMatchEnd(Match match, JDA jda, int playerOneKills, int playerTwoKills) {
+  private void announceMatchEnd(Match match, JDA jda, int playerOneKills, int playerTwoKills) {
     MessageCreateData msg =
         new MessageCreateBuilder()
             .addEmbeds(match.toEndEmbed(playerOneKills, playerTwoKills))
@@ -103,8 +119,20 @@ public class Matchmaker {
     channel.sendMessage(msg).queue();
   }
 
-  public Optional<Match> buildMatch(Region r) {
-    List<String> users = new ArrayList<>(REGISTERED_USERS.get(r));
+  private void announceMatchTimeout(Match match, JDA jda) {
+    MessageCreateData msg = new MessageCreateBuilder().addEmbeds(match.toTimeoutEmbed()).build();
+    TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
+    channel.sendMessage(msg).queue();
+  }
+
+  private void announceMatchDisagreement(Match match, JDA jda) {
+    MessageCreateData msg = new MessageCreateBuilder().addEmbeds(match.toDisagerementEmbed()).build();
+    TextChannel channel = Objects.requireNonNull(jda.getChannelById(TextChannel.class, CHANNEL_ID));
+    channel.sendMessage(msg).queue();
+  }
+
+  public Optional<Match> buildMatch(Region r, Optional<User> maybePlayerOne, Optional<User> maybePlayerTwo) {
+    List<User> users = new ArrayList<>(REGISTERED_USERS.get(r));
     LOGGER.info("building match for {} | Player count: {}", r.getRegionName(), users.size());
     if (users.size() < 2) {
       LOGGER.info("not enough players in {} for a match", r.getRegionName());
@@ -112,10 +140,10 @@ public class Matchmaker {
     }
 
     Collections.shuffle(users);
-    String playerOne = users.get(0);
-    String playerTwo = users.get(1);
+    User playerOne = maybePlayerOne.orElse(users.get(0));
+    User playerTwo = maybePlayerTwo.orElse(users.get(1));
 
-    List<String> registeredUsers = REGISTERED_USERS.get(r);
+    List<User> registeredUsers = REGISTERED_USERS.get(r);
     registeredUsers.remove(playerOne);
     registeredUsers.remove(playerTwo);
 
@@ -126,7 +154,7 @@ public class Matchmaker {
         playerTwo);
 
     try {
-      Match match = new Match(playerOne, playerTwo, r);
+      Match match = new Match(playerOne.getId(), playerTwo.getId(), r);
       ACTIVE_MATCHES.add(match);
 
       return Optional.of(match);
@@ -136,7 +164,23 @@ public class Matchmaker {
     }
   }
 
-  public ConcurrentHashMap<Region, List<String>> getUsers() {
+  public ConcurrentHashMap<Region, List<User>> getUsers() {
     return REGISTERED_USERS;
+  }
+
+  public HashMap<Region, List<String>> getUsernames() {
+    HashMap<Region, List<String>> userNamesInRegions = new HashMap<>();
+    var regions = REGISTERED_USERS.keys();
+    Region region = regions.nextElement();
+    while (regions.hasMoreElements()) {
+      List<String> usernames =
+          REGISTERED_USERS.get(region).stream()
+              .map(User::getName)
+              .collect(Collectors.toCollection(ArrayList::new));
+      userNamesInRegions.put(region, usernames);
+      region = regions.nextElement();
+    }
+
+    return userNamesInRegions;
   }
 }

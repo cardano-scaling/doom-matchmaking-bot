@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
@@ -42,9 +43,16 @@ public class MatchmakeCommand extends SlashCommand {
                 Region.fromRegionName(
                     Objects.requireNonNull(event.getOption("region")).getAsString()));
 
+    Optional<User> maybePlayerOne = event.getOption("player_one") == null
+            ? Optional.empty() : Optional.of(Objects.requireNonNull(event.getOption("player_one")).getAsUser());
+
+
+    Optional<User> maybePlayerTwo = event.getOption("player_one") == null
+                                    ? Optional.empty() : Optional.of(Objects.requireNonNull(event.getOption(
+                                            "player_two")).getAsUser());
     maybeRegion.ifPresentOrElse(
         region -> {
-          Optional<Match> maybeMatch = MATCHMAKER.buildMatch(region);
+          Optional<Match> maybeMatch = MATCHMAKER.buildMatch(region, Optional.empty(), Optional.empty());
           maybeMatch.ifPresent(
               match -> MATCHMAKER.announceMatchesStart(List.of(match), event.getJDA()));
           event
@@ -70,16 +78,21 @@ public class MatchmakeCommand extends SlashCommand {
   }
 
   private List<OptionData> getCommandOptions() {
-    OptionData option =
+    OptionData regionOption =
         new OptionData(
             OptionType.STRING,
             "region",
             "Specify the region in which you'd like to " + "play a match");
 
     for (Region r : Region.values()) {
-      option.addChoice(r.getPrettyName(), r.getRegionName());
+      regionOption.addChoice(r.getPrettyName(), r.getRegionName());
     }
 
-    return List.of(option);
+    OptionData playerOneOption =
+            new OptionData(OptionType.USER, "player_one", "Player one (optional)").setRequired(false);
+    OptionData playerTwoOption =
+            new OptionData(OptionType.USER, "player_two", "Player two (optional)").setRequired(false);
+
+    return List.of(regionOption, playerOneOption, playerTwoOption);
   }
 }

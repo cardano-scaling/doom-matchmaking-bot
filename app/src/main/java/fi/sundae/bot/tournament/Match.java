@@ -29,20 +29,17 @@ public class Match {
 
   private String requestNewGame() throws URISyntaxException, IOException, InterruptedException {
     try (HttpClient client = HttpClient.newHttpClient()) {
-      HttpRequest request =
-          HttpRequest.newBuilder()
-              .uri(
-                  new URI(
-                      "https://api.%s.hydra-doom.sundae.fi/elimination"
-                          .formatted(REGION.getRegionName())))
-              .GET()
-              .build();
+      String url =
+          "https://api.%s.hydra-doom.sundae.fi/elimination".formatted(REGION.getRegionName());
+      HttpRequest request = HttpRequest.newBuilder().uri(new URI(url)).GET().build();
 
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() == 200) {
         JsonObject body = JsonParser.parseString(response.body()).getAsJsonObject();
         return body.get("game_id").getAsString();
       }
+
+      System.out.printf("Request to %s failed with status code: %s%n", url, response.statusCode());
 
       return null;
     }
@@ -59,6 +56,32 @@ public class Match {
         .setDescription("Your match is ready for you! Click the button below to join the game.")
         .addField("Game ID", "`%s`".formatted(this.CODE), true)
         .build();
+  }
+
+  public MessageEmbed toTimeoutEmbed() {
+    return new EmbedBuilder()
+        .setColor(Color.RED)
+        .setTitle("Match Timed Out")
+        .setDescription(
+            """
+            The match between <@%s> and <@%s> has failed to complete. Any kills during the match have been discarded
+            """
+                .formatted(getPlayerOne(), getPlayerTwo()))
+        .addField("Game ID", "`%s`".formatted(this.CODE), true)
+        .build();
+  }
+
+  public MessageEmbed toDisagerementEmbed() {
+    return new EmbedBuilder()
+            .setColor(Color.RED)
+            .setTitle("Match Disagreement")
+            .setDescription(
+                    """
+                    The match between <@%s> and <@%s> has failed due to a disagreement in state. Any kills during the match have been discarded
+                    """
+                            .formatted(getPlayerOne(), getPlayerTwo()))
+            .addField("Game ID", "`%s`".formatted(this.CODE), true)
+            .build();
   }
 
   public MessageEmbed toEndEmbed(int playerOneKills, int playerTwoKills) {
@@ -80,7 +103,7 @@ public class Match {
           """
                        Game over! <@%s> and <@%s> are evenly matched and no one won
                        """
-              .formatted(getPlayerTwo(), getPlayerTwo());
+              .formatted(getPlayerOne(), getPlayerTwo());
 
     return new EmbedBuilder()
         .setColor(Color.GREEN)
@@ -90,9 +113,9 @@ public class Match {
             "Kill Counts",
             """
                                                      <@%s>: `%s`
-                                                     <@%s>: `%s
+                                                     <@%s>: `%s`
                                                      """
-                .formatted(getPlayerOne(), getPlayerTwo(), playerOneKills, playerTwoKills),
+                .formatted(getPlayerOne(), playerOneKills, getPlayerTwo(), playerTwoKills),
             false)
         .build();
   }
@@ -113,8 +136,7 @@ public class Match {
             """
              A new match has been created!
 
-             Please join the match promptly using [this link](%s)"""
-                .formatted(getJoinLink()))
+             A private thread will be created with the connection information. Please join the game promptly!""")
         .addField("Player 1", String.format("<@%s>", PLAYER_ONE), false)
         .addField("Player 2", String.format("<@%s>", PLAYER_TWO), false)
         .addField("Region", REGION.getPrettyName(), false)

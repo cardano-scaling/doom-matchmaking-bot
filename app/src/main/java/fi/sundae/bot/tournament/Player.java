@@ -116,6 +116,35 @@ public class Player {
         linkedDiscordAccount);
   }
 
+  @Override
+  public String toString() {
+    return "Player{"
+        + "authProvider='"
+        + authProvider
+        + '\''
+        + ", authProviderId='"
+        + authProviderId
+        + '\''
+        + ", authWallet='"
+        + authWallet
+        + '\''
+        + ", authName='"
+        + authName
+        + '\''
+        + ", authEmail='"
+        + authEmail
+        + '\''
+        + ", authAvatar='"
+        + authAvatar
+        + '\''
+        + ", linkedWalletStakeAddress='"
+        + linkedWalletStakeAddress
+        + '\''
+        + ", linkedDiscordAccount="
+        + linkedDiscordAccount
+        + '}';
+  }
+
   public static class DiscordAccount {
     private String id;
     private String name;
