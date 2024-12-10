@@ -95,7 +95,7 @@ public class Match {
                     The match between <@%s> and <@%s> has failed due to a disagreement in state. Any kills during the match have been discarded
                     """
                 .formatted(getPlayerOne(), getPlayerTwo()))
-        .addField("Game ID", "`%s`".formatted(this.CODE), true)
+        .addField("Node ID", "`%s`".formatted(this.CODE), true)
         .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
         .build();
   }
@@ -109,7 +109,7 @@ public class Match {
                             The match between <@%s> and <@%s> has failed due to a player disconnect. Any kills during the match have been discarded
                             """
                 .formatted(getPlayerOne(), getPlayerTwo()))
-        .addField("Game ID", "`%s`".formatted(this.CODE), true)
+        .addField("Node ID", "`%s`".formatted(this.CODE), true)
         .addField("Game ID", "`%s`".formatted(this.gameTxHash), true)
         .build();
   }

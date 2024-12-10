@@ -77,8 +77,6 @@ public class Matchmaker {
             .findFirst();
 
     if (maybeMatch.isEmpty()) {
-      ACTIVE_MATCHES.forEach(
-          match -> System.out.printf("Match gameTx: %s\n", match.getGameTxHash()));
       LOGGER.info("Match {} is not in ACTIVE_MATCHES", matchRequest.getGameId());
       return;
     }
