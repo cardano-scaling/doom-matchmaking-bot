@@ -204,6 +204,11 @@ public class Matchmaker {
       userNamesInRegions.put(region, usernames);
       region = regions.nextElement();
     }
+    List<String> usernames =
+            REGISTERED_USERS.get(region).stream()
+                            .map(User::getName)
+                            .collect(Collectors.toCollection(ArrayList::new));
+    userNamesInRegions.put(region, usernames);
 
     return userNamesInRegions;
   }
