@@ -32,7 +32,9 @@ public class Matchmaker {
     LOGGER.info("building matches for all regions");
     List<Match> matches = new ArrayList<>();
     for (Region r : Region.values()) {
-      buildMatch(r, Optional.empty(), Optional.empty()).ifPresent(matches::add);
+      while (REGISTERED_USERS.get(r).size() > 2) {
+        buildMatch(r, Optional.empty(), Optional.empty()).ifPresent(matches::add);
+      }
     }
 
     return matches;
@@ -167,10 +169,6 @@ public class Matchmaker {
     User playerOne = maybePlayerOne.orElse(users.get(0));
     User playerTwo = maybePlayerTwo.orElse(users.get(1));
 
-    List<User> registeredUsers = REGISTERED_USERS.get(r);
-    registeredUsers.remove(playerOne);
-    registeredUsers.remove(playerTwo);
-
     LOGGER.info(
         "Built match for {} | Player one: {} | Player two: {}",
         r.getRegionName(),
@@ -180,6 +178,10 @@ public class Matchmaker {
     try {
       Match match = new Match(playerOne.getId(), playerTwo.getId(), r);
       ACTIVE_MATCHES.add(match);
+
+      List<User> registeredUsers = REGISTERED_USERS.get(r);
+      registeredUsers.remove(playerOne);
+      registeredUsers.remove(playerTwo);
 
       return Optional.of(match);
     } catch (Exception e) {
