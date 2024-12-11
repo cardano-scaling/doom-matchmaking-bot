@@ -32,7 +32,7 @@ public class Matchmaker {
     LOGGER.info("building matches for all regions");
     List<Match> matches = new ArrayList<>();
     for (Region r : Region.values()) {
-      while (REGISTERED_USERS.get(r).size() > 2) {
+      while (REGISTERED_USERS.get(r).size() >= 2) {
         buildMatch(r, Optional.empty(), Optional.empty()).ifPresent(matches::add);
       }
     }
