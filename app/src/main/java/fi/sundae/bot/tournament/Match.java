@@ -1,7 +1,6 @@
 package fi.sundae.bot.tournament;
 
 import com.google.gson.*;
-
 import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -10,7 +9,6 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -245,5 +243,4 @@ public class Match {
       return jsonObject;
     }
   }
-
 }

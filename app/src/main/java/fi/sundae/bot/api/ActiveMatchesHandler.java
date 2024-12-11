@@ -18,7 +18,8 @@ public class ActiveMatchesHandler implements Handler {
 
   @Override
   public void handle(@NotNull Context ctx) throws Exception {
-    Gson gson = new GsonBuilder().registerTypeAdapter(Match.class, new Match.MatchSerializer()).create();
+    Gson gson =
+        new GsonBuilder().registerTypeAdapter(Match.class, new Match.MatchSerializer()).create();
     ctx.json(gson.toJson(MATCHMAKER.getActiveMatches()));
   }
 }
