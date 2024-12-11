@@ -1,14 +1,16 @@
 package fi.sundae.bot.tournament;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -229,4 +231,19 @@ public class Match {
 
     return hash;
   }
+
+  public static class MatchSerializer implements JsonSerializer<Match> {
+    @Override
+    public JsonElement serialize(Match match, Type typeOfSrc, JsonSerializationContext context) {
+      JsonObject jsonObject = new JsonObject();
+      jsonObject.addProperty("player_one", match.getPlayerOne());
+      jsonObject.addProperty("player_two", match.getPlayerTwo());
+      jsonObject.addProperty("region", match.getRegion().getPrettyName());
+      jsonObject.addProperty("code", match.getCode());
+      jsonObject.addProperty("thread", match.getThread().getId());
+      jsonObject.addProperty("gameTxHash", match.getGameTxHash());
+      return jsonObject;
+    }
+  }
+
 }
