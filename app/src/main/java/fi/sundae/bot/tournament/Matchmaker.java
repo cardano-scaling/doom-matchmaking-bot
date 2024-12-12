@@ -84,7 +84,14 @@ public class Matchmaker {
     }
     Match match = maybeMatch.get();
     ACTIVE_MATCHES.remove(match);
-    match.getThread().delete().queue();
+    match
+        .getThread()
+        .delete()
+        .queue(
+            success ->
+                LOGGER.info("Successfully deleted thread for game {}", match.getGameTxHash()),
+            error ->
+                LOGGER.warn("failed to delete thread for game {}", match.getGameTxHash(), error));
 
     if (matchRequest.getResult() == MatchResult.TIMEOUT) {
       LOGGER.info("Match {} is over due to timeout", matchRequest.getGameId());
