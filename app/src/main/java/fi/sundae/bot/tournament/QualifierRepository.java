@@ -100,7 +100,7 @@ public class QualifierRepository {
         Gson gson = new Gson();
         JsonObject body = JsonParser.parseString(response.body()).getAsJsonObject();
         Player player = gson.fromJson(body.get("account"), Player.class);
-        return Optional.of(player);
+        return Optional.ofNullable(player);
       }
 
       LOGGER.info("None 200 status code when fetching player. Status: {}", response.statusCode());
