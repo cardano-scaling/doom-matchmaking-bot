@@ -8,8 +8,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MatchResultEmbed {
   private String playerOne;
@@ -18,7 +16,6 @@ public class MatchResultEmbed {
   private String gameId;
   private long playerOneKills, playerTwoKills;
   private MatchResult result;
-
 
   public MatchResultEmbed(MessageEmbed embed) {
     Color embedColor = embed.getColor();
@@ -57,13 +54,13 @@ public class MatchResultEmbed {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(Objects.requireNonNull(field.getValue()));
         List<Long> numbers = new ArrayList<>();
-          while (matcher.find()) {
-            long number = Long.parseLong(matcher.group(1).trim());
-            numbers.add(number);
-          }
+        while (matcher.find()) {
+          long number = Long.parseLong(matcher.group(1).trim());
+          numbers.add(number);
+        }
 
-          playerOneKills = numbers.get(0);
-          playerTwoKills = numbers.get(1);
+        playerOneKills = numbers.get(0);
+        playerTwoKills = numbers.get(1);
       }
     }
   }
