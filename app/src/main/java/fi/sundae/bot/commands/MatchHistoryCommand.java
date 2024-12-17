@@ -8,6 +8,9 @@ import fi.sundae.bot.api.MatchResult;
 import fi.sundae.bot.api.MatchResultSerializer;
 import fi.sundae.bot.tournament.MatchResultEmbed;
 import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -66,8 +69,28 @@ public class MatchHistoryCommand extends SlashCommand {
                         .create();
 
                 LOGGER.info("Building JSON");
+                String json = gson.toJson(matchResults);
+                String fileName = "results.json";
+                try {
+                  File file = new File(fileName);
+                  try (FileWriter writer = new FileWriter(file)) {
+                    writer.write(json);
+                  }
 
-                event.getHook().editOriginal("```" + gson.toJson(matchResults) + "```").queue();
+                  event
+                      .getHook()
+                      .editOriginal("See attached for results")
+                      .setFiles(net.dv8tion.jda.api.utils.FileUpload.fromData(file))
+                      .queue();
+                  file.delete();
+                } catch (IOException e) {
+                  LOGGER.error("Failed to create file", e);
+                  event
+                      .getHook()
+                      .editOriginal("Failed to create file to share here. Check logs for more info")
+                      .queue();
+                }
+
               } catch (Exception e) {
                 LOGGER.error("Failed parsing messages", e);
                 event
