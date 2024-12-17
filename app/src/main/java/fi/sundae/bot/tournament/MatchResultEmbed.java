@@ -50,12 +50,12 @@ public class MatchResultEmbed {
       } else if ("Game ID".equals(field.getName())) {
         gameId = Objects.requireNonNull(field.getValue()).replace("`", "");
       } else if ("Kill Counts".equals(field.getName())) {
-        String regex = ":\\s`\\s*(\\d+)\\s*`";
+        String regex = ":\\s`\\s*(-?\\d+)\\s*`";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(Objects.requireNonNull(field.getValue()));
         List<Long> numbers = new ArrayList<>();
         while (matcher.find()) {
-          long number = Long.parseLong(matcher.group(1).trim());
+          long number = Long.parseLong(matcher.group(1));
           numbers.add(number);
         }
 
