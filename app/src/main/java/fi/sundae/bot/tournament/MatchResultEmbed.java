@@ -8,14 +8,17 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MatchResultEmbed {
   private String playerOne;
   private String playerTwo;
   private String nodeId;
   private String gameId;
-  private int playerOneKills, playerTwoKills;
+  private long playerOneKills, playerTwoKills;
   private MatchResult result;
+
 
   public MatchResultEmbed(MessageEmbed embed) {
     Color embedColor = embed.getColor();
@@ -50,18 +53,17 @@ public class MatchResultEmbed {
       } else if ("Game ID".equals(field.getName())) {
         gameId = Objects.requireNonNull(field.getValue()).replace("`", "");
       } else if ("Kill Counts".equals(field.getName())) {
-        String regex = ":(\\s*\\d+)";
+        String regex = ":\\s`\\s*(\\d+)\\s*`";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(Objects.requireNonNull(field.getValue()));
+        List<Long> numbers = new ArrayList<>();
+          while (matcher.find()) {
+            long number = Long.parseLong(matcher.group(1).trim());
+            numbers.add(number);
+          }
 
-        List<Integer> numbers = new ArrayList<>();
-        while (matcher.find()) {
-          int number = Integer.parseInt(matcher.group(1).trim());
-          numbers.add(number);
-        }
-
-        playerOneKills = numbers.get(0);
-        playerTwoKills = numbers.get(1);
+          playerOneKills = numbers.get(0);
+          playerTwoKills = numbers.get(1);
       }
     }
   }
@@ -82,11 +84,11 @@ public class MatchResultEmbed {
     return gameId;
   }
 
-  public int getPlayerOneKills() {
+  public long getPlayerOneKills() {
     return playerOneKills;
   }
 
-  public int getPlayerTwoKills() {
+  public long getPlayerTwoKills() {
     return playerTwoKills;
   }
 
